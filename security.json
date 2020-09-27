@@ -1,0 +1,54 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment":{
+            "type": "string"
+        }
+    },
+    "variables": {
+        "v_regionCode":"[if(equals(resourcegroup().location,'canadacentral'), 'CaC', 'CaE')]",
+        "v_loganalyticsName": "[concat('LogAnalytics-',variables('v_regionCode'),'-',parameters('environment'),'-DevSecOps')]",
+        "v_storageaccountName":"[concat('tg00stg',toLower(variables('v_regionCode')),toLower(parameters('environment')),'88seclogs')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-03-15-preview",
+            "name": "[variables('v_logAnalyticsName')]",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "properties": {
+                "sku": {
+                    "name": "pergb2018"
+                },
+            "retentionInDays": 120,
+            "workspaceCapping": {
+                "dailyQuotaGb": -1
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('v_storageaccountName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": true,
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "accessTier": "Hot"
+            }
+        }
+    ]
+}

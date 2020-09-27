@@ -1,0 +1,62 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+    "parameters": {
+        "regionCode": {
+            "type": "string",
+            "defaultValue": "CaC"
+        },
+        "environment":{
+            "type": "string"
+        }
+    },
+    "variables":{
+        "v_diagsettingsName":"Techgenix-DiagnosticSettings-Default",
+        "v_loganalyticsName": "[concat('LogAnalytics-',parameters('regionCode'),'-',parameters('environment'),'-DevSecOps')]",
+        "v_loganalyticsId":"[concat(subscription().id,'/resourcegroups/rg-security/providers/microsoft.operationalinsights/workspaces/',variables('v_loganalyticsname'))]"
+    },
+	"resources": [
+        {
+			"type": "Microsoft.Insights/diagnosticSettings",
+			"apiVersion": "2017-05-01-preview",
+			"name": "[variables('v_diagsettingsName')]",
+			"properties": {
+				"workspaceId": "[variables('v_loganalyticsId')]",
+				"logs": [
+					{
+						"category": "Administrative",
+						"enabled": true
+					},
+					{
+						"category": "Security",
+						"enabled": true
+					},
+					{
+						"category": "ServiceHealth",
+						"enabled": true
+					},
+					{
+						"category": "Alert",
+						"enabled": true
+                    },
+					{
+						"category": "Recommendation",
+						"enabled": true
+                    },                    
+					{
+						"category": "Policy",
+						"enabled": true
+                    },
+                    {
+						"category": "Autoscale",
+						"enabled": true
+                    },   
+                    {
+						"category": "ResourceHealth",
+						"enabled": true
+                    }   
+				]
+			}
+		}
+	]
+}
