@@ -1,0 +1,80 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "domainZone": {
+            "type":"string"
+        },
+        "record-CNAME-name":{
+            "type": "array"
+        },
+        "record-CNAME-address":{
+            "type": "array"
+        },
+        "record-A-name":{
+            "type": "array"
+        },
+        "record-A-address":{
+            "type": "array"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/dnszones",
+            "apiVersion": "2018-05-01",
+            "name": "[parameters('domainZone')]",
+            "location": "global",
+            "properties": {
+                "zoneType": "Public"
+            }
+        },
+        {
+            "type": "Microsoft.Network/dnszones/CNAME",
+            "apiVersion": "2018-05-01",
+            "name": "[concat(parameters('domainZone'), '/', parameters('record-CNAME-name')[CopyIndex()])]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/dnszones', parameters('domainZone'))]"
+            ],
+            "properties": {
+                "TTL": 3600,
+                "CNAMERecord": {
+                    "cname": "[parameters('record-CNAME-address')[CopyIndex()]]"
+                },
+                "targetResource": {}
+            },
+            "copy": {
+                "name": "copy-alias",
+                "count": "[length(parameters('record-CNAME-name'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/dnszones/A",
+            "apiVersion": "2018-05-01",
+            "name": "[concat(parameters('domainZone'), '/', parameters('record-A-name')[CopyIndex()])]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/dnszones', parameters('domainZone'))]"
+            ],
+            "properties": {
+                "TTL": 3600,
+                "ARecords": [
+                    {
+                        "ipv4Address": "[parameters('record-A-address')[CopyIndex()]]"
+                    }
+                ],
+                "targetResource": {}
+            },
+            "copy": {
+                "name": "copy-A",
+                "count": "[length(parameters('record-A-name'))]"
+            }
+        }
+    ],
+    "outputs": {
+        "out_rgLocation": {
+            "type": "string",
+            "value": "[resourceGroup().name]"
+        }
+    }
+}

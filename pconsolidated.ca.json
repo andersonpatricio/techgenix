@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "domainZone":{
+            "value": "pconsolidated.ca"
+        },
+        "record-CNAME-name":{
+            "value": ["app1", "app2"]
+        },
+        "record-CNAME-address":{
+            "value": ["app1.azurefd.net", "app2.azurefd.net"]
+        },
+        "record-A-name":{
+            "value":["www","support"]
+        },
+        "record-A-address":{
+            "value": ["10.10.10.10","20.20.20.20"]
+        }
+    }
+}
